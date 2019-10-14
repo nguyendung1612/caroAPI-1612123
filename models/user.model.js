@@ -24,5 +24,9 @@ module.exports = {
     return await User.findOne({
       where: obj
     });
+  },
+
+  getUserById: async id => {
+    return await User.findById(id);
   }
 };
