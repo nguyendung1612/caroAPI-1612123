@@ -1,5 +1,4 @@
 const userModel = require('../models/user.model');
-// const passport = require('passport');
 const passportJWT = require('passport-jwt');
 
 const ExtractJWT = passportJWT.ExtractJwt;
@@ -28,8 +27,6 @@ module.exports = passport => {
               return done(null, false, { message: 'Incorrect password.' });
             }
 
-            console.log('login');
-
             return done(null, user, { message: 'Logged In Successfully.' });
           })
           .catch(err => {
@@ -41,14 +38,31 @@ module.exports = passport => {
 
   passport.use(
     new JWTStrategy(
+      // {
+      //   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+      //   secretOrKey: 'mrm.dung'
+      // },
+      // (jwt_payload, done) => {
+      //   //find the user in db if needed
+      //   return userModel
+      //     .getUser({ id: jwt_payload })
+      //     .then(user => {
+      //       return done(null, user);
+      //     })
+      //     .catch(err => {
+      //       return done(err);
+      //     });
+      // }
       {
-        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-        secretOrKey: 'mrm.dung'
+        //secret we used to sign our JWT
+        secretOrKey: 'mrm.dung',
+        //we expect the user to send the token as a query paramater with the name 'secret_token'
+        jwtFromRequest: ExtractJWT.fromUrlQueryParameter('token')
       },
       (jwt_payload, done) => {
         //find the user in db if needed
         return userModel
-          .getUserById({ id: jwt_payload.data.id })
+          .getUser({ id: jwt_payload })
           .then(user => {
             return done(null, user);
           })

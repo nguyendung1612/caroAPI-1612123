@@ -28,6 +28,13 @@ require('./middlewares/passport');
 
 app.use('/', indexRouter);
 app.use('/user', usersRouter);
+app.get(
+  '/me',
+  passport.authenticate('jwt', { session: false }),
+  (req, res, next) => {
+    res.send(req.user);
+  }
+);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
