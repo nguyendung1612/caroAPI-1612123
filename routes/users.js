@@ -10,6 +10,12 @@ router.get('/', (req, res, next) => {
   userModel.getAllUsers().then(users => res.json(users));
 });
 
+//logout
+router.post('/logout', (req, res, next) => {
+  req.logOut();
+  res.send('Sign Out');
+});
+
 // register
 router.post('/register', (req, res, next) => {
   const { name, username, password } = req.body;
@@ -37,7 +43,7 @@ router.post('/login', (req, res, next) => {
       }
 
       const token = jwt.sign(user.id, 'mrm.dung');
-
+      req.session.token = token;
       return res.json({ user, token });
     });
   })(req, res, next);

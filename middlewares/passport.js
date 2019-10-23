@@ -38,22 +38,22 @@ module.exports = passport => {
 
   passport.use(
     new JWTStrategy(
-      // {
-      //   jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-      //   secretOrKey: 'mrm.dung'
-      // },
-      // (jwt_payload, done) => {
-      //   //find the user in db if needed
-      //   return userModel
-      //     .getUser({ id: jwt_payload })
-      //     .then(user => {
-      //       return done(null, user);
-      //     })
-      //     .catch(err => {
-      //       return done(err);
-      //     });
-      // }
       {
+        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+        secretOrKey: 'mrm.dung'
+      },
+      (jwt_payload, done) => {
+        //find the user in db if needed
+        return userModel
+          .getUser({ id: jwt_payload })
+          .then(user => {
+            return done(null, user);
+          })
+          .catch(err => {
+            return done(err);
+          });
+      }
+      /* {
         //secret we used to sign our JWT
         secretOrKey: 'mrm.dung',
         //we expect the user to send the token as a query paramater with the name 'secret_token'
@@ -69,7 +69,7 @@ module.exports = passport => {
           .catch(err => {
             return done(err);
           });
-      }
+      } */
     )
   );
 

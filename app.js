@@ -5,15 +5,24 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var passport = require('passport');
-
+var cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var session = require('express-session');
 
 var app = express();
 
 app.use(passport.initialize());
 require('./middlewares/passport')(passport);
 
+app.use(
+  session({
+    secret: 'sadasdzxc412124',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 }
+  })
+);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -23,6 +32,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(cors());
 
 require('./middlewares/passport');
 
@@ -35,6 +45,12 @@ app.get(
     res.send(req.user);
   }
 );
+app.get('/token', (req, res, next) => {
+  if (req.session.token) {
+    res.send(req.session.token);
+  }
+  res.send('NOT_LOGGED_IN');
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
