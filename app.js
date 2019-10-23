@@ -42,7 +42,7 @@ app.get(
   '/me',
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
-    res.send(req.user);
+    res.json(req.user);
   }
 );
 app.get('/token', (req, res, next) => {
