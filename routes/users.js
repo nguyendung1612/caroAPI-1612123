@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var userModel = require('../models/user.model');
-
+var bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 
@@ -19,8 +19,10 @@ router.post('/logout', (req, res, next) => {
 // register
 router.post('/register', (req, res, next) => {
   const { name, username, password } = req.body;
-  console.log(username + '-' + password);
-  userModel.createUser({ name, username, password }).then(user => {
+
+  var saltRounds = 10; //tạo key ảo để nối vào password => hash
+  var hash = bcrypt.hashSync(password, saltRounds);
+  userModel.createUser({ name, username, password: hash }).then(user => {
     res.json({ user, msg: 'account created' });
   });
 });
@@ -43,8 +45,11 @@ router.post('/login', (req, res, next) => {
       }
 
       const token = jwt.sign(user.id, 'mrm.dung');
-      req.session.token = token;
-      return res.json({ user, token });
+      data = {
+        name: user.name,
+        username: user.username
+      };
+      return res.json({ data, token });
     });
   })(req, res, next);
 });

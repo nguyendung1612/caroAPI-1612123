@@ -1,5 +1,6 @@
 const userModel = require('../models/user.model');
 const passportJWT = require('passport-jwt');
+var bcrypt = require('bcrypt');
 
 const ExtractJWT = passportJWT.ExtractJwt;
 
@@ -23,7 +24,8 @@ module.exports = passport => {
               });
             }
 
-            if (!(user.password === password)) {
+            var ret = bcrypt.compareSync(password, user.password);
+            if (!ret) {
               return done(null, false, { message: 'Incorrect password.' });
             }
 
@@ -47,7 +49,11 @@ module.exports = passport => {
         return userModel
           .getUser({ id: jwt_payload })
           .then(user => {
-            return done(null, user);
+            data = {
+              name: user.name,
+              username: user.username
+            };
+            return done(null, data);
           })
           .catch(err => {
             return done(err);
