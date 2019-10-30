@@ -42,10 +42,25 @@ app.get(
   '/me',
   passport.authenticate('jwt', { session: false }),
   (req, res, next) => {
-    res.json(req.user);
+    res.json(req.data);
   }
 );
+app.get(
+  '/auth/fb',
+  passport.authenticate('facebook', { session: false, scope: 'email' })
+);
 
+app.get(
+  '/auth/fb/info',
+  passport.authenticate('facebook', {
+    session: false,
+    successRedirect: '/',
+    failureRedirect: '/'
+  }),
+  (req, res) => {
+    res.json(req.account);
+  }
+);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

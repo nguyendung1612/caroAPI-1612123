@@ -1,5 +1,6 @@
 const userModel = require('../models/user.model');
 const passportJWT = require('passport-jwt');
+const passportFB = require('passport-facebook').Strategy;
 var bcrypt = require('bcrypt');
 
 const ExtractJWT = passportJWT.ExtractJwt;
@@ -79,8 +80,38 @@ module.exports = passport => {
     )
   );
 
+  passport.use(
+    new passportFB(
+      {
+        clientID: '2508398732591082',
+        clientSecret: '45ba94bdda12df4f4312afc0e6bd0b1d',
+        callbackURL: 'http://localhost:4040/user/auth/fb/info',
+        profileFields: ['email', 'displayname', 'username', 'gender']
+      },
+      (accessToken, refreshToken, profile, done) => {
+        userModel
+          .getUserFB({ code: profile._json.id })
+          .then(user => {
+            if (user) {
+              return done(null, user, { message: 'Logged In Successfully.' });
+            }
+            const code = profile._json.id;
+            const name = profile._json.name;
+            const email = profile._json.email;
+            userModel.createUserFB({ code, name, email }).then(account => {
+              console.log(account);
+              return done(null, account);
+            });
+          })
+          .catch(err => {
+            return done(err, false);
+          });
+      }
+    )
+  );
+
   passport.serializeUser((user, done) => {
-    return done(null, user);
+    return done(null, user.id);
   });
 
   passport.deserializeUser((user, done) => {
