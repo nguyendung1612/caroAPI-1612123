@@ -58,7 +58,7 @@ app.get(
     failureRedirect: 'https://caro2-1612123.herokuapp.com/'
   }),
   (req, res) => {
-    res.json(req.account);
+    res.redirect('https://caro2-1612123.herokuapp.com/');
   }
 );
 // catch 404 and forward to error handler
