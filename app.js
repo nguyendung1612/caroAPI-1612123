@@ -51,7 +51,7 @@ app.get(
 );
 
 app.get(
-  '/auth/fb/info',
+  '/auth/fb/callback',
   passport.authenticate('facebook', {
     session: false,
     successRedirect: 'https://caro2-1612123.herokuapp.com/',
