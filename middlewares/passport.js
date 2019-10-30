@@ -86,7 +86,7 @@ module.exports = passport => {
         clientID: '2508398732591082',
         clientSecret: '45ba94bdda12df4f4312afc0e6bd0b1d',
         callbackURL: 'https://caroapi-1612123.herokuapp.com/auth/fb/callback',
-        profileFields: ['email', 'username', 'gender']
+        profileFields: ['email', 'name', 'gender']
       },
       (accessToken, refreshToken, profile, done) => {
         userModel
