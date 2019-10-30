@@ -53,9 +53,7 @@ app.get(
 app.get(
   '/auth/fb/info',
   passport.authenticate('facebook', {
-    session: false,
-    successRedirect: '/',
-    failureRedirect: '/'
+    session: false
   }),
   (req, res) => {
     res.json(req.account);
