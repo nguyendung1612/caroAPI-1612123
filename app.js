@@ -53,7 +53,9 @@ app.get(
 app.get(
   '/auth/fb/info',
   passport.authenticate('facebook', {
-    session: false
+    session: false,
+    successRedirect: 'https://caro2-1612123.herokuapp.com/user/login',
+    failureRedirect: 'https://caro2-1612123.herokuapp.com/user/login'
   }),
   (req, res) => {
     res.json(req.account);
