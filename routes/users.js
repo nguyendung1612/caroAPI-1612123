@@ -4,6 +4,7 @@ var userModel = require('../models/user.model');
 var bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
+var upload = require('../middlewares/upload');
 
 // Get all users
 router.get('/', (req, res, next) => {
@@ -45,13 +46,55 @@ router.post('/login', (req, res, next) => {
       }
 
       const token = jwt.sign(user.id, 'mrm.dung');
-      data = {
-        name: user.name,
-        username: user.username
-      };
-      return res.json({ data, token });
+
+      return res.json({ user, token });
     });
   })(req, res, next);
+});
+
+router.post('/update', (req, res, next) => {
+  const { name, username, id } = req.body;
+  var values = { name: name, username: username };
+  var options = {
+    where: { id: id }
+  };
+  console.log(values);
+  userModel.updateDataLocal(values, options).then(user => {
+    res.json({ user, msg: 'account updated' });
+  });
+});
+
+router.post('/avatar/:id', (req, res, next) => {
+  upload.single('avatar')(req, res, err => {
+    if (err) {
+      return res.json({
+        error: err.message
+      });
+    }
+
+    var avatar;
+    console.log(req.file.path);
+    if (req.file) {
+      avatar = '/images/' + req.file.filename;
+    } else {
+      avatar = '/images/avatar.png';
+    }
+    console.log(avatar);
+    var { id } = req.params;
+    console.log(id);
+
+    var values = { avatar: avatar };
+    var options = {
+      where: { id: id }
+    };
+
+    userModel
+      .updateDataLocal(values, options)
+      .then(user => {
+        res.redirect('/');
+      })
+      .catch(next);
+  });
 });
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const userModel = require('../models/user.model');
+var passport = require('passport');
 const passportJWT = require('passport-jwt');
 const passportFB = require('passport-facebook').Strategy;
 var bcrypt = require('bcrypt');
@@ -8,7 +9,10 @@ const ExtractJWT = passportJWT.ExtractJwt;
 const localStrategy = require('passport-local').Strategy;
 const JWTStrategy = passportJWT.Strategy;
 
-module.exports = passport => {
+module.exports = app => {
+  app.use(passport.initialize());
+  app.use(passport.session());
+
   passport.use(
     new localStrategy(
       {
@@ -50,11 +54,11 @@ module.exports = passport => {
         return userModel
           .getUser({ id: jwt_payload })
           .then(user => {
-            data = {
-              name: user.name,
-              username: user.username
-            };
-            return done(null, data);
+            // data = {
+            //   name: user.name,
+            //   username: user.username
+            // };
+            return done(null, user);
           })
           .catch(err => {
             return done(err);
@@ -85,22 +89,28 @@ module.exports = passport => {
       {
         clientID: '2508398732591082',
         clientSecret: '45ba94bdda12df4f4312afc0e6bd0b1d',
-        callbackURL: 'https://caroapi-1612123.herokuapp.com/auth/fb/callback',
-        profileFields: ['email', 'name', 'gender']
+        callbackURL: 'http://localhost:4040/auth/fb/callback',
+        profileFields: ['email', 'name', 'gender', 'photos']
       },
       (accessToken, refreshToken, profile, done) => {
+        console.log(profile);
         userModel
           .getUserFB({ code: profile._json.id })
           .then(user => {
             if (user) {
-              return done(null, user, { message: 'Logged In Successfully.' });
+              const data = { accessToken, user };
+              return done(null, data, { message: 'Logged In Successfully.' });
             }
-            const code = profile._json.id;
-            const name = profile._json.name;
-            const email = profile._json.email;
-            userModel.createUserFB({ code, name, email }).then(account => {
-              console.log(account);
-              return done(null, account);
+
+            const newAccount = {
+              code: profile._json.id,
+              name: profile.name.givenName + ' ' + profile.name.familyName,
+              email: profile._json.email
+            };
+
+            userModel.createUserFB(newAccount).then(account => {
+              const data = { accessToken, account };
+              return done(null, data);
             });
           })
           .catch(err => {
@@ -111,7 +121,7 @@ module.exports = passport => {
   );
 
   passport.serializeUser((user, done) => {
-    return done(null, user.id);
+    return done(null, user);
   });
 
   passport.deserializeUser((user, done) => {
