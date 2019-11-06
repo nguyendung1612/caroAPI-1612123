@@ -63,7 +63,8 @@ app.get(
     // failureRedirect: 'caro2-1612123.herokuapp.com'
   }),
   (req, res, next) => {
-    return res.json(req.user);
+    // return res.json(req.user);
+    res.redirect('https://localhost:3000/auth/fb/callback');
   }
 );
 

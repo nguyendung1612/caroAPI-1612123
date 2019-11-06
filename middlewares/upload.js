@@ -7,7 +7,6 @@ var storage = multer.diskStorage({
     cb(null, './public/images');
   },
   filename: function(req, file, cb) {
-    console.log(req.params.id);
     //kiểm tra: nếu là register thì sẽ lấy id mới
     //nếu là sửa thông tin thì sẽ lấy lại id của nó
     // if (!req.user) {

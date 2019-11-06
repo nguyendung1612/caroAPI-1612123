@@ -73,13 +73,13 @@ router.post('/avatar/:id', (req, res, next) => {
     }
 
     var avatar;
-    console.log(req.file.path);
+
     if (req.file) {
       avatar = '/images/' + req.file.filename;
     } else {
       avatar = '/images/avatar.png';
     }
-    console.log(avatar);
+
     var { id } = req.params;
     console.log(id);
 
