@@ -87,8 +87,7 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
-var stt = 0;
-var mangUsers = [{ id: 'XXXX', username: 'XXXX' }];
+var mangUsers = [];
 
 io.on('connection', socket => {
   //Sv listen, bien data client gui len
@@ -97,34 +96,21 @@ io.on('connection', socket => {
     // io.sockets.emit('Server-send-data', data);//sv gui lai tat ca client
     // socket.emit('Server-send-data', data); //sv chi gui lai thang phat
     // socket.broadcast.emit('Server-send-data', data); //gui cho nhung client con lai
-    user = {
-      id: socket.id,
-      username: data
-    };
-    var index = _findIndex(mangUsers, ['id', socket.id]);
+    var index = mangUsers.indexOf(data);
     if (index < 0) {
-      mangUsers.push(user);
+      mangUsers.push(data);
       socket.Username = data;
-      // socket.Host = false;
-      // socket.Turn = false;
-      // socket.join(`room${stt}`);
-      // socket.Phong = `room${stt}`;
-      // if (_findIndex(mangUsers, ['id', socket.id]) === 1) {
-      //   socket.Host = true;
-      //   socket.Turn = true;
-      //   socket.emit('host', true);
-      // }
+      index = mangUsers.indexOf(data);
+      console.log(mangUsers, index);
     }
 
-    var div = index / 2;
+    var div = Math.floor(index / 2);
     var mod = index % 2;
-
     socket.Host = mod === 1 ? true : false;
-    socket.join(`room${div + mod}`);
-    socket.Phong = `room${div + mod}`;
+    socket.join(`room${div}`);
+    socket.Phong = `room${div}`;
 
     if (mangUsers.length === 2) {
-      stt++;
       mangUsers = [];
       socket.emit('server-send-success', data);
     }
@@ -163,14 +149,10 @@ io.on('connection', socket => {
   });
 
   socket.on('exit', () => {
-    io.sockets.clients(socket.Phong).forEach(s => {
-      s.leave(someRoom);
-    });
+    socket.disconnect();
   });
 
   socket.on('disconnect', () => {
-    // io.sockets.clients(socket.Phong).forEach(s => {
-    //   s.leave(someRoom);
-    // });
+    console.log('disconnect');
   });
 });
